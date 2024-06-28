@@ -1,42 +1,125 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			starWarsCharacters: [],
+			starWarsCharacterDetails: {},
+
+			starWarsPlanets: [],
+			starWarsPlanetDetails: {},
+
+			starWarsVehicles: [],
+			starWarsVehicleDetails: {},
+
+			favoritesList: []
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+			getAllCharacters: async () => {
+				try {
+					const response = await fetch(`https://www.swapi.tech/api/people`);
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+					const data = await response.json();
 
-				//reset the global store
-				setStore({ demo: demo });
+					if (data.results)
+						setStore({ ...getStore(), starWarsCharacters: data.results});
+
+				} catch (error) {
+					alert("Hubo un error al recuperar los datos de los personajes: " + error);
+					console.error(error);
+				}
+			},
+
+			getCharacterDetails: async (id) => {
+				try {
+					const response = await fetch(`https://www.swapi.tech/api/people/${id}`);
+
+					const data = await response.json();
+
+					if (data.result)
+						setStore({ ...getStore(), starWarsCharacterDetails: data.result.properties});
+
+				} catch (error) {
+					alert("Hubo un error al recuperar los detalles del personaje: " + error);
+					console.error(error);
+				}
+			},
+
+			getAllPlanets: async () => {
+				try {
+					const response = await fetch(`https://www.swapi.tech/api/planets`);
+
+					const data = await response.json();
+
+					if (data.results)
+						setStore({ ...getStore(), starWarsPlanets: data.results});
+
+				} catch (error) {
+					alert("Hubo un error al recuperar los datos de los planetas: " + error);
+					console.error(error);
+				}
+			},
+
+			getPlanetDetails: async (id) => {
+				try {
+					const response = await fetch(`https://www.swapi.tech/api/planets/${id}`);
+
+					const data = await response.json();
+
+					if (data.result)
+						setStore({ ...getStore(), starWarsPlanetDetails: data.result.properties});
+
+				} catch (error) {
+					alert("Hubo un error al recuperar los detalles del planeta: " + error);
+					console.error(error);
+				}
+			},
+
+			getAllVehicles: async () => {
+				try {
+					const response = await fetch(`https://www.swapi.tech/api/vehicles`);
+
+					const data = await response.json();
+
+					if (data.results)
+						setStore({ ...getStore(), starWarsVehicles: data.results});
+
+				} catch (error) {
+					alert("Hubo un error al recuperar los datos de los vehículos: " + error);
+					console.error(error);
+				}
+			},
+
+			getVehicleDetails: async (id) => {
+				try {
+					const response = await fetch(`https://www.swapi.tech/api/vehicles/${id}`);
+
+					const data = await response.json();
+
+					if (data.result)
+						setStore({ ...getStore(), starWarsVehicleDetails: data.result.properties});
+
+				} catch (error) {
+					alert("Hubo un error al recuperar los detalles del vehículo: " + error);
+					console.error(error);
+				}
+			},
+
+			addFavorites: (uid, name, url, type) => {
+				const newFavorite = { uid: uid, name: name, url: url, type: type };
+
+				setStore({ ...getStore(), favoritesList: [ ...getStore().favoritesList, newFavorite]});
+			},
+
+			getFavorites: () => {
+				return getStore().favoritesList;
+			},
+
+			deleteFavorites: (index) => {
+				const { favoritesList } = getStore();
+				const newFavorite = favoritesList.filter((element, i) => i != index);
+
+				setStore({ ...getStore(), favoritesList: newFavorite});
+
+				console.log([favoritesList]);
 			}
 		}
 	};
